@@ -30,7 +30,7 @@ class TryOnService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('API error: ${response.statusCode}');
+        throw Exception('The AI try-on service is currently unavailable. Please try again later.');
       }
     } catch (e) {
       rethrow;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
+import '../controllers/cart_controller.dart';
+import '../controllers/wishlist_controller.dart';
 
 enum UserRole { customer, brand, guest }
 
@@ -11,6 +13,10 @@ class AuthController extends ChangeNotifier {
 
   UserRole _role = UserRole.guest;
   bool _isLoggedIn = false;
+  bool _isLoading = false;
+  
+  bool get isLoading => _isLoading;
+  String? _userId;
   String? _userName;
   String? _userEmail;
   String? _profilePic;
@@ -19,6 +25,7 @@ class AuthController extends ChangeNotifier {
 
   UserRole get role => _role;
   bool get isLoggedIn => _isLoggedIn;
+  String? get userId => _userId;
   String? get userName => _userName;
   String? get userEmail => _userEmail;
   String? get profilePic => _profilePic;
@@ -34,6 +41,7 @@ class AuthController extends ChangeNotifier {
       _isLoggedIn = true;
       final roleStr = prefs.getString('user_role');
       _role = roleStr == 'brand' ? UserRole.brand : UserRole.customer;
+      _userId = prefs.getString('user_id');
       _userName = prefs.getString('user_name');
       _userEmail = prefs.getString('user_email');
       _profilePic = prefs.getString('user_profile_pic');
@@ -41,7 +49,14 @@ class AuthController extends ChangeNotifier {
       _address = prefs.getString('user_address');
       
       ApiService.setToken(token);
+      
+      // Load user-specific data
+      await CartController().reset();
+      await WishlistController().reset();
       notifyListeners();
+    } else {
+      await CartController().reset();
+      await WishlistController().reset();
     }
   }
 
@@ -49,6 +64,8 @@ class AuthController extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    _isLoading = true;
+    notifyListeners();
     try {
       final data = await ApiService.post('/auth/login', {
         'email': email,
@@ -58,6 +75,9 @@ class AuthController extends ChangeNotifier {
       await _setUserData(data);
     } catch (e) {
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -67,6 +87,8 @@ class AuthController extends ChangeNotifier {
     required String password,
     required UserRole role,
   }) async {
+    _isLoading = true;
+    notifyListeners();
     try {
       final data = await ApiService.post('/auth/register', {
         'name': name,
@@ -78,6 +100,9 @@ class AuthController extends ChangeNotifier {
       await _setUserData(data);
     } catch (e) {
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -122,9 +147,11 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+
   Future<void> _setUserData(Map<String, dynamic> data) async {
     _isLoggedIn = true;
     _role = data['role'] == 'admin' || data['role'] == 'brand' ? UserRole.brand : UserRole.customer;
+    _userId = data['_id']; 
     _userName = data['name'];
     _userEmail = data['email'];
     _profilePic = data['profilePic'];
@@ -139,11 +166,16 @@ class AuthController extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     if (token != null) await prefs.setString('token', token);
     await prefs.setString('user_role', isBrand ? 'brand' : 'customer');
+    if (_userId != null) await prefs.setString('user_id', _userId!);
     if (_userName != null) await prefs.setString('user_name', _userName!);
     if (_userEmail != null) await prefs.setString('user_email', _userEmail!);
     if (_profilePic != null) await prefs.setString('user_profile_pic', _profilePic!);
     if (_phone != null) await prefs.setString('user_phone', _phone!);
     if (_address != null) await prefs.setString('user_address', _address!);
+
+    // Reset controllers for new user
+    await CartController().reset();
+    await WishlistController().reset();
 
     notifyListeners();
   }
@@ -151,6 +183,7 @@ class AuthController extends ChangeNotifier {
   Future<void> logout() async {
     _isLoggedIn = false;
     _role = UserRole.guest;
+    _userId = null;
     _userName = null;
     _userEmail = null;
     _profilePic = null;
@@ -160,6 +193,10 @@ class AuthController extends ChangeNotifier {
     
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    
+    // Reset controllers for guest
+    await CartController().reset();
+    await WishlistController().reset();
     
     notifyListeners();
   }

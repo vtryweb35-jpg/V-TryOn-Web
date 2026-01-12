@@ -73,7 +73,6 @@ class Footer extends StatelessWidget {
                   links: const {
                     'About Us': '/about',
                     'Contact': '/contact',
-                    'Admin': '/admin',
                   },
                 ),
                 _FooterColumn(

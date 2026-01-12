@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/product.dart';
+import '../models/product.dart'; // Duplicate but will be fixed by formatter or just one
+import '../controllers/wishlist_controller.dart';
 import '../theme/app_theme.dart';
 
 class ProductCard extends StatefulWidget {
@@ -47,25 +49,22 @@ class _ProductCardState extends State<ProductCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image Section
+                // Image Section
               Expanded(
                 child: Stack(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                        child: AnimatedScale(
-                          duration: const Duration(milliseconds: 500),
-                          scale: _isHovered ? 1.05 : 1.0,
-                          curve: Curves.easeOutCubic,
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                           child: Image.network(
                             widget.product.imageUrl,
                             fit: BoxFit.cover,
+                            width: double.infinity,
                             errorBuilder: (context, error, stackTrace) => Center(
                               child: Icon(Icons.image, color: Colors.grey[400], size: 48),
                             ),
@@ -102,6 +101,31 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                         ),
                       ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: ListenableBuilder(
+                        listenable: WishlistController(),
+                        builder: (context, _) {
+                          final isWishlisted = WishlistController().isWishlisted(widget.product.id);
+                          return InkWell(
+                            onTap: () => WishlistController().toggleWishlist(widget.product),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isWishlisted ? Icons.favorite : Icons.favorite_border,
+                                color: isWishlisted ? Colors.red : Colors.grey[400],
+                                size: 20,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),

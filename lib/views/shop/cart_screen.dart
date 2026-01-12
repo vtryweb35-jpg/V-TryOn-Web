@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../controllers/cart_controller.dart';
+import '../../controllers/auth_controller.dart';
+import '../auth/login_modal.dart';
 import '../../theme/app_theme.dart';
 
 class CartScreen extends StatefulWidget {
@@ -171,7 +173,13 @@ class _CartScreenState extends State<CartScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () => context.push('/checkout'),
+                              onPressed: () {
+                                if (!AuthController().isLoggedIn) {
+                                  _showLoginRequiredDialog(context);
+                                  return;
+                                }
+                                context.push('/checkout');
+                              },
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 24),
                                 backgroundColor: AppTheme.primaryColor,
@@ -187,6 +195,48 @@ class _CartScreenState extends State<CartScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLoginRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.lock_outline, color: AppTheme.primaryColor),
+            SizedBox(width: 12),
+            Text('Login Required', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Please sign in to your account to proceed with your order and enjoy a personalized shopping experience.',
+          style: TextStyle(color: Colors.black54, fontSize: 16),
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('MAYBE LATER', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) => const LoginModal(),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('LOG IN NOW', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

@@ -18,6 +18,7 @@ import '../views/profile/profile_screen.dart';
 import '../views/orders/orders_screen.dart';
 import '../views/payment/test_payment_screen.dart';
 import '../views/payment/payment_screen.dart';
+import '../views/shop/wishlist_screen.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -78,6 +79,7 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(path: '/wishlist', builder: (context, state) => const WishlistScreen()),
       GoRoute(path: '/test-payment', builder: (context, state) => const TestPaymentScreen()),
     ],
   );

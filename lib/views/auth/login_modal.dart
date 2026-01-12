@@ -21,6 +21,7 @@ class _LoginModalState extends State<LoginModal> {
   final _nameController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -74,12 +75,17 @@ class _LoginModalState extends State<LoginModal> {
                     _ToggleBtn(
                       label: 'Brand',
                       isSelected: !isCustomer,
-                      onTap: () => setState(() => isCustomer = false),
+                      onTap: () => setState(() {
+                        isCustomer = false;
+                        _errorMessage = null;
+                      }),
                     ),
                   ],
                 ),
               ),
-                const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              if (_errorMessage != null) _buildErrorWidget(),
+              const SizedBox(height: 16),
               
               if (!isLogin) ...[
                  TextField(
@@ -163,16 +169,28 @@ class _LoginModalState extends State<LoginModal> {
                 ),
               
               const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
+              ListenableBuilder(
+                listenable: AuthController(),
+                builder: (context, _) {
+                  final isLoading = AuthController().isLoading;
+                  return SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : () async {
+                    setState(() => _errorMessage = null);
+
+                    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+                      setState(() => _errorMessage = 'Please fill in all required fields');
+                      return;
+                    }
+
+                    if (!isLogin && (_nameController.text.isEmpty || _confirmPasswordController.text.isEmpty)) {
+                      setState(() => _errorMessage = 'Please fill in all required fields');
+                      return;
+                    }
+
                     if (!isLogin && _passwordController.text != _confirmPasswordController.text) {
-                      AppSnackbar.show(
-                        context,
-                        message: 'Passwords do not match',
-                        isError: true,
-                      );
+                      setState(() => _errorMessage = 'Passwords do not match');
                       return;
                     }
 
@@ -205,21 +223,25 @@ class _LoginModalState extends State<LoginModal> {
                         }
                       }
                     } catch (e) {
-                      if (context.mounted) {
-                        AppSnackbar.show(
-                          context,
-                          message: e.toString(),
-                          isError: true,
-                        );
-                      }
+                      setState(() => _errorMessage = e.toString().contains('Exception:') 
+                          ? e.toString().split('Exception:')[1].trim() 
+                          : e.toString());
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    backgroundColor: AppTheme.primaryColor,
-                  ),
-                  child: Text(isLogin ? (isCustomer ? 'Sign In as Customer' : 'Sign In as Brand') : 'Create Account'),
-                ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        backgroundColor: AppTheme.primaryColor,
+                      ),
+                      child: isLoading 
+                        ? const SizedBox(
+                            height: 20, 
+                            width: 20, 
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text(isLogin ? (isCustomer ? 'Sign In as Customer' : 'Sign In as Brand') : 'Create Account'),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 24),
               Row(
@@ -227,7 +249,10 @@ class _LoginModalState extends State<LoginModal> {
                 children: [
                   Text(isLogin ? "Don't have an account? " : "Already have an account? "),
                   TextButton(
-                    onPressed: () => setState(() => isLogin = !isLogin),
+                    onPressed: () => setState(() {
+                      isLogin = !isLogin;
+                      _errorMessage = null;
+                    }),
                     child: Text(isLogin ? 'Sign up' : 'Log in'),
                   ),
                 ],
@@ -235,6 +260,29 @@ class _LoginModalState extends State<LoginModal> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.stressColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.stressColor.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: AppTheme.stressColor, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              _errorMessage!,
+              style: const TextStyle(color: AppTheme.stressColor, fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
       ),
     );
   }

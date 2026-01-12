@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/app_scaffold.dart';
+import '../../controllers/order_controller.dart';
 import '../../theme/app_theme.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -74,29 +75,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         const SizedBox(height: 24),
                         _buildTextField('Country', _countryCtrl, Icons.public_outlined),
                         const SizedBox(height: 48),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                context.push('/order-confirm', extra: {
-                                  'name': _nameCtrl.text,
-                                  'email': _emailCtrl.text,
-                                  'phone': _phoneCtrl.text,
-                                  'address': _addressCtrl.text,
-                                  'city': _cityCtrl.text,
-                                  'postalCode': _postalCtrl.text,
-                                  'country': _countryCtrl.text,
-                                });
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primaryColor,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: const Text('CONTINUE TO CONFIRMATION', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
+                        ListenableBuilder(
+                          listenable: OrderController(),
+                          builder: (context, _) {
+                            final isLoading = OrderController().isLoading;
+                            return SizedBox(
+                              width: double.infinity,
+                              height: 60,
+                              child: ElevatedButton(
+                                onPressed: isLoading ? null : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    context.push('/order-confirm', extra: {
+                                      'name': _nameCtrl.text,
+                                      'email': _emailCtrl.text,
+                                      'phone': _phoneCtrl.text,
+                                      'address': _addressCtrl.text,
+                                      'city': _cityCtrl.text,
+                                      'postalCode': _postalCtrl.text,
+                                      'country': _countryCtrl.text,
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryColor,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: isLoading 
+                                  ? const SizedBox(
+                                      height: 20, 
+                                      width: 20, 
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    )
+                                  : const Text('CONTINUE TO CONFIRMATION', style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -118,7 +131,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'Required';
+            if (label == 'Email') {
+              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+            }
+            if (label == 'Phone' && value.length < 10) {
+              return 'Enter a valid phone number';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             prefixIcon: Icon(icon),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

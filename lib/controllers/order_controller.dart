@@ -47,6 +47,8 @@ class OrderController extends ChangeNotifier {
     required String paymentMethod,
     required double totalPrice,
   }) async {
+    _isLoading = true;
+    notifyListeners();
     try {
       final data = await ApiService.post('/orders', {
         'orderItems': items.map((i) => i.toJson()).toList(),
@@ -59,10 +61,12 @@ class OrderController extends ChangeNotifier {
       });
       final newOrder = Order.fromJson(data);
       _orders.insert(0, newOrder);
-      notifyListeners();
       return newOrder;
     } catch (e) {
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

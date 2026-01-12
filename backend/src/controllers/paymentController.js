@@ -2,6 +2,24 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = require('stripe')(stripeSecretKey);
 const Order = require('../models/Order');
 
+// Helper to map Stripe errors to friendly messages
+const handleStripeError = (error) => {
+    switch (error.type) {
+        case 'StripeCardError':
+            return error.message; // These are usually user-friendly already
+        case 'StripeRateLimitError':
+            return 'Too many requests. Please try again later.';
+        case 'StripeInvalidRequestError':
+            return 'Invalid payment parameters.';
+        case 'StripeAuthenticationError':
+            return 'Payment authentication failed.';
+        case 'StripeConnectionError':
+            return 'Network error connecting to payment provider.';
+        default:
+            return 'An unexpected payment error occurred.';
+    }
+};
+
 // @desc    Create Payment Intent
 // @route   POST /api/payment/create-payment-intent
 // @access  Private
@@ -19,7 +37,7 @@ const createPaymentIntent = async (req, res) => {
             clientSecret: paymentIntent.client_secret,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: handleStripeError(error) });
     }
 };
 
@@ -57,7 +75,7 @@ const confirmPayment = async (req, res) => {
             res.status(404).json({ message: 'Order not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: handleStripeError(error) });
     }
 };
 

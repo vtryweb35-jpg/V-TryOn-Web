@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/cart_controller.dart';
+import '../../controllers/auth_controller.dart';
+import '../auth/login_modal.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/product_card.dart';
 
@@ -265,8 +267,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () =>
-                                context.go('/try-on', extra: product),
+                            onPressed: () {
+                              if (!AuthController().isLoggedIn) {
+                                _showLoginRequiredDialog(context, 'virtual try-on');
+                                return;
+                              }
+                              context.go('/try-on', extra: product);
+                            },
                             icon: const Icon(Icons.accessibility_new, size: 24),
                             label: const Text('VIRTUAL TRY-ON'),
                             style: ElevatedButton.styleFrom(
@@ -280,6 +287,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           width: double.infinity,
                           child: OutlinedButton(
                             onPressed: () {
+                              if (!AuthController().isLoggedIn) {
+                                _showLoginRequiredDialog(context, 'add items to cart');
+                                return;
+                              }
                               CartController().addToCart(product);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -340,6 +351,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLoginRequiredDialog(BuildContext context, String action) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.account_circle_outlined, color: AppTheme.primaryColor),
+            const SizedBox(width: 12),
+            Text('Sign In Required', style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'To $action, please sign in to your account. It only takes a minute!',
+          style: const TextStyle(color: Colors.black54, fontSize: 16),
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('CANCEL', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) => const LoginModal(),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('GO TO LOGIN', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

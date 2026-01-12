@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import '../controllers/auth_controller.dart';
 
 class ApiService {
   // Use 10.0.2.2 for Android emulator to access localhost
@@ -102,6 +104,9 @@ class ApiService {
       if (response.body.isEmpty) return {};
       return jsonDecode(response.body);
     } else {
+      if (response.statusCode == 401) {
+        AuthController().logout();
+      }
       try {
         final body = jsonDecode(response.body);
         throw Exception(body['message'] ?? 'Error occurred');

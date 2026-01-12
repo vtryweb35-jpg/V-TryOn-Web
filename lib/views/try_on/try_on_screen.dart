@@ -149,11 +149,13 @@ class _TryOnScreenState extends State<TryOnScreen>
         setState(() {
           _currentStep = 0;
           _isError = true;
-          _errorMessage = e.toString();
+          _errorMessage = e.toString().contains('Exception:') 
+              ? e.toString().split('Exception:')[1].trim()
+              : e.toString();
         });
         AppSnackbar.show(
           context,
-          message: 'Error: $_errorMessage',
+          message: _errorMessage,
           isError: true,
         );
       }

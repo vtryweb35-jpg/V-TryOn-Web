@@ -9,10 +9,46 @@ class ProductController extends ChangeNotifier {
   ProductController._internal();
 
   List<Product> _products = [];
+  List<Product> _filteredProducts = [];
   bool _isLoading = false;
+  bool _isFiltering = false;
 
-  List<Product> get products => _products;
+  List<Product> get products => _isFiltering ? _filteredProducts : _products;
   bool get isLoading => _isLoading;
+
+  List<String> get categories {
+    final Set<String> uniqueCategories = {};
+    for (var p in _products) {
+      uniqueCategories.add(_normalizeCategory(p.category));
+    }
+    return ['All', ...uniqueCategories.toList()..sort()];
+  }
+
+  String _normalizeCategory(String category) {
+    if (category.isEmpty) return 'Other';
+    final trimmed = category.trim();
+    if (trimmed.toLowerCase() == 'tshirt' || trimmed.toLowerCase() == 't-shirt') {
+      return 'T-Shirt';
+    }
+    // Simple title case implementation
+    if (trimmed.length <= 1) return trimmed.toUpperCase();
+    return '${trimmed[0].toUpperCase()}${trimmed.substring(1).toLowerCase()}';
+  }
+
+  void filterProducts(String query, String category) {
+    if (query.isEmpty && (category == 'All' || category.isEmpty)) {
+      _isFiltering = false;
+      _filteredProducts = [];
+    } else {
+      _isFiltering = true;
+      _filteredProducts = _products.where((product) {
+        final matchesQuery = product.name.toLowerCase().contains(query.toLowerCase());
+        final matchesCategory = category == 'All' || category.isEmpty || _normalizeCategory(product.category) == category;
+        return matchesQuery && matchesCategory;
+      }).toList();
+    }
+    notifyListeners();
+  }
 
   Future<void> fetchAllProducts() async {
     _isLoading = true;
@@ -20,6 +56,8 @@ class ProductController extends ChangeNotifier {
     try {
       final List<dynamic> data = await ApiService.get('/products');
       _products = data.map((json) => Product.fromJson(json)).toList();
+      _filteredProducts = [];
+      _isFiltering = false;
     } catch (e) {
       debugPrint('Error fetching products: $e');
     } finally {

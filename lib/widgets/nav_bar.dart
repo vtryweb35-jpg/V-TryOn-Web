@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../views/auth/login_modal.dart';
 import '../controllers/cart_controller.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/wishlist_controller.dart';
 import '../routes/app_router.dart';
 
 class NavBar extends StatefulWidget {
@@ -97,6 +98,13 @@ class _NavBarState extends State<NavBar> {
                     listenable: cartController,
                     builder: (context, child) {
                       return _CartIcon(cartController: cartController);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ListenableBuilder(
+                    listenable: WishlistController(),
+                    builder: (context, child) {
+                      return const _WishlistIcon();
                     },
                   ),
                   const SizedBox(width: 8),
@@ -267,6 +275,62 @@ class _CartIconState extends State<_CartIcon> {
                   constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                   child: Text(
                     '${widget.cartController.totalItems}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WishlistIcon extends StatefulWidget {
+  const _WishlistIcon();
+
+  @override
+  State<_WishlistIcon> createState() => _WishlistIconState();
+}
+
+class _WishlistIconState extends State<_WishlistIcon> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final wishlist = WishlistController();
+    final itemCount = wishlist.items.length;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 200),
+        scale: _isHovered ? 1.1 : 1.0,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            IconButton(
+              onPressed: () => context.go('/wishlist'),
+              icon: Icon(
+                itemCount > 0 ? Icons.favorite : Icons.favorite_border,
+                color: _isHovered ? Colors.red : Colors.black87,
+              ),
+            ),
+            if (itemCount > 0)
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                  child: Text(
+                    '$itemCount',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                   ),

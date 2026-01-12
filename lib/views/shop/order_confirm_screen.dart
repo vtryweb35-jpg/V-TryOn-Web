@@ -228,11 +228,26 @@ class _OrderConfirmScreenState extends State<OrderConfirmScreen> {
       }
     } catch (e) {
       if (mounted) {
+        String errorMessage = 'Error placing order: $e';
+        
+        if (e is StripeException) {
+          // Check for specific Stripe failures or just use the updated message
+          if (e.error.code == FailureCode.Failed) {
+             errorMessage = 'Please enter valid card details.';
+          } else {
+             errorMessage = e.error.localizedMessage ?? e.error.message ?? 'Payment failed. Please check your card details.';
+          }
+        } else if (e.toString().contains('Payment')) {
+           // Provide a cleaner fallback for generic payment exceptions
+           errorMessage = 'Payment failed. Please verify your card details.';
+        } else if (e.toString().contains('Exception:')) {
+           // Clean up standard exceptions
+           errorMessage = e.toString().split('Exception:')[1].trim();
+        }
+
         AppSnackbar.show(
           context,
-          message: e.toString().contains('Payment') 
-              ? e.toString() 
-              : 'Error placing order: $e',
+          message: errorMessage,
           isError: true,
         );
       }

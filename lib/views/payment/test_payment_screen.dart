@@ -18,7 +18,11 @@ class _TestPaymentScreenState extends State<TestPaymentScreen> {
   Future<void> _handlePayment() async {
     final amount = double.tryParse(_amountController.text);
     if (amount == null || amount <= 0) {
-      AppSnackbar.show(context, message: 'Please enter a valid amount', isError: true);
+      AppSnackbar.show(
+        context,
+        message: 'Please enter a valid amount',
+        isError: true,
+      );
       return;
     }
 
@@ -33,7 +37,11 @@ class _TestPaymentScreenState extends State<TestPaymentScreen> {
 
       if (success) {
         if (mounted) {
-          AppSnackbar.show(context, message: 'Payment Successful!', isError: false);
+          AppSnackbar.show(
+            context,
+            message: 'Payment Successful!',
+            isError: false,
+          );
         }
       }
     } catch (e) {
@@ -92,10 +100,7 @@ class _TestPaymentScreenState extends State<TestPaymentScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.all(12),
-              child: const SizedBox(
-                height: 50,
-                child: CardField(),
-              ),
+              child: const SizedBox(height: 50, child: CardField()),
             ),
             const SizedBox(height: 32),
             ElevatedButton(
@@ -107,7 +112,10 @@ class _TestPaymentScreenState extends State<TestPaymentScreen> {
               ),
               child: _isLoading
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Pay with Stripe', style: TextStyle(fontSize: 18)),
+                  : const Text(
+                      'Pay with Stripe',
+                      style: TextStyle(fontSize: 18),
+                    ),
             ),
             const SizedBox(height: 16),
             const Text(

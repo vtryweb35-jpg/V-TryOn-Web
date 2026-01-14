@@ -30326,7 +30326,7 @@ ou(a){var s=0,r=A.K(t.z),q,p
 var $async$ou=A.G(function(b,c){if(b===1)return A.H(c,r)
 while(true)switch(s){case 0:p=A
 s=3
-return A.z(A.aQd(A.d6("http://localhost:5000/api"+a,0,null),A.Oc()),$async$ou)
+return A.z(A.aQd(A.d6("https://v-tryon-web.onrender.com/api"+a,0,null),A.Oc()),$async$ou)
 case 3:q=p.Ob(c)
 s=1
 break
@@ -30334,7 +30334,7 @@ case 1:return A.I(q,r)}})
 return A.J($async$ou,r)},
 lq(a,b){var s=0,r=A.K(t.z),q,p,o,n
 var $async$lq=A.G(function(c,d){if(c===1)return A.H(d,r)
-while(true)switch(s){case 0:p=A.d6("http://localhost:5000/api"+a,0,null)
+while(true)switch(s){case 0:p=A.d6("https://v-tryon-web.onrender.com/api"+a,0,null)
 o=A.Oc()
 n=A
 s=3
@@ -30346,7 +30346,7 @@ case 1:return A.I(q,r)}})
 return A.J($async$lq,r)},
 Bz(a,b){var s=0,r=A.K(t.z),q,p,o,n
 var $async$Bz=A.G(function(c,d){if(c===1)return A.H(d,r)
-while(true)switch(s){case 0:p=A.d6("http://localhost:5000/api"+a,0,null)
+while(true)switch(s){case 0:p=A.d6("https://v-tryon-web.onrender.com/api"+a,0,null)
 o=A.Oc()
 n=A
 s=3
@@ -30360,7 +30360,7 @@ By(a){var s=0,r=A.K(t.z),q,p
 var $async$By=A.G(function(b,c){if(b===1)return A.H(c,r)
 while(true)switch(s){case 0:p=A
 s=3
-return A.z(A.aZl(A.d6("http://localhost:5000/api"+a,0,null),A.Oc()),$async$By)
+return A.z(A.aZl(A.d6("https://v-tryon-web.onrender.com/api"+a,0,null),A.Oc()),$async$By)
 case 3:q=p.Ob(c)
 s=1
 break
@@ -30368,7 +30368,7 @@ case 1:return A.I(q,r)}})
 return A.J($async$By,r)},
 vW(a,b,c,d,e){var s=0,r=A.K(t.z),q,p,o,n
 var $async$vW=A.G(function(f,g){if(f===1)return A.H(g,r)
-while(true)switch(s){case 0:p=A.aUc(e,A.d6("http://localhost:5000/api"+a,0,null))
+while(true)switch(s){case 0:p=A.aUc(e,A.d6("https://v-tryon-web.onrender.com/api"+a,0,null))
 A.Oc().am(0,new A.a96(p))
 if(d!=null)p.x.S(0,d)
 if(t.Cm.b(b))p.y.push(A.aOt(c,b,A.EK("image","jpeg",null),"upload.jpg"))

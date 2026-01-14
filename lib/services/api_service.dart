@@ -1,13 +1,14 @@
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../controllers/auth_controller.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android emulator to access localhost
-  // Use http://localhost:5000 for iOS simulator or web
-  static const String baseUrl = 'http://localhost:5000/api'; 
+  // Use Render URL for production (Vercel), localhost for development
+  static const String baseUrl = kReleaseMode 
+      ? 'https://v-tryon-web.onrender.com/api' 
+      : 'http://localhost:5000/api'; 
   
   static String? _token;
 

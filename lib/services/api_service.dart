@@ -6,9 +6,12 @@ import '../controllers/auth_controller.dart';
 
 class ApiService {
   // Use Render URL for production (Vercel), localhost for development
-  static const String baseUrl = kReleaseMode 
-      ? 'https://v-tryon-web.onrender.com/api' 
-      : 'http://localhost:5000/api'; 
+  // static const String baseUrl = kReleaseMode 
+  //     ? 'https://v-tryon-web.onrender.com/api' 
+  //     : 'http://localhost:5000/api'; 
+  
+  // Temporarily hardcoded for production deployment verification
+  static const String baseUrl = 'https://v-tryon-web.onrender.com/api'; 
   
   static String? _token;
 

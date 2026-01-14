@@ -11,7 +11,13 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        "http://localhost:3000",
+        "https://v-try-on-web.vercel.app"
+    ],
+    credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static('src/uploads'));
 

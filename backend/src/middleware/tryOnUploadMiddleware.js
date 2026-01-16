@@ -16,13 +16,19 @@ const tryOnStorage = new CloudinaryStorage({
 const upload = multer({
     storage: tryOnStorage,
     fileFilter: function (req, file, cb) {
+        console.log('Upload attempting:', {
+            originalname: file.originalname,
+            mimetype: file.mimetype
+        });
+
         const filetypes = /jpg|jpeg|png/;
         const extname = filetypes.test(file.originalname.toLowerCase());
         const mimetype = filetypes.test(file.mimetype);
 
-        if (extname && mimetype) {
+        if (extname || mimetype) {
             return cb(null, true);
         } else {
+            console.error('File rejected. Ext:', extname, 'Mime:', mimetype);
             cb('Images only!');
         }
     },

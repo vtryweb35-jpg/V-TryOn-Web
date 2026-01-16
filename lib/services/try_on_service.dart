@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'api_service.dart';
 
 class TryOnService {
@@ -17,12 +18,14 @@ class TryOnService {
         'person',
         personImageBytes,
         filename: 'person.jpg',
+        contentType: MediaType('image', 'jpeg'),
       ));
 
       request.files.add(http.MultipartFile.fromBytes(
         'cloth',
         clothImageBytes,
         filename: 'cloth.jpg',
+        contentType: MediaType('image', 'jpeg'),
       ));
 
       final streamedResponse = await request.send();

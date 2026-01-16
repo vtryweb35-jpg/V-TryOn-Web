@@ -8,6 +8,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const tryOnRoutes = require('./routes/tryOnRoutes');
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/try-on', tryOnRoutes);
 
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;

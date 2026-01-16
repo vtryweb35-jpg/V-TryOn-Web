@@ -140,7 +140,7 @@ class _TryOnScreenState extends State<TryOnScreen>
 
       if (mounted) {
         setState(() {
-          _resultImageUrl = '${TryOnService.baseUrl}${response['result_url']}';
+          _resultImageUrl = response['imageUrl'];
           _currentStep = 2;
         });
       }

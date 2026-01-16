@@ -17,7 +17,7 @@ const createProduct = asyncHandler(async (req, res) => {
     let image = req.body.image;
 
     if (req.file) {
-        image = `http://${req.headers.host}/uploads/products/${req.file.filename}`;
+        image = req.file.path;
     }
 
     const product = new Product({
@@ -83,7 +83,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.countInStock = countInStock || product.countInStock;
 
         if (req.file) {
-            product.image = `http://${req.headers.host}/uploads/products/${req.file.filename}`;
+            product.image = req.file.path;
         }
 
         const updatedProduct = await product.save();

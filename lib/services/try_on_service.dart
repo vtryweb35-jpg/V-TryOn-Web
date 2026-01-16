@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'api_service.dart';
 
 class TryOnService {
-  static const String baseUrl = 'http://localhost:8000';
+  static String get baseUrl => ApiService.baseUrl;
 
   static Future<Map<String, dynamic>> runTryOn({
     required Uint8List personImageBytes,
@@ -13,13 +14,13 @@ class TryOnService {
       final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/try-on'));
 
       request.files.add(http.MultipartFile.fromBytes(
-        'person_image',
+        'person',
         personImageBytes,
         filename: 'person.jpg',
       ));
 
       request.files.add(http.MultipartFile.fromBytes(
-        'cloth_image',
+        'cloth',
         clothImageBytes,
         filename: 'cloth.jpg',
       ));
@@ -30,7 +31,8 @@ class TryOnService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('The AI try-on service is currently unavailable. Please try again later.');
+        final error = json.decode(response.body);
+        throw Exception(error['error'] ?? 'The AI try-on service is currently unavailable. Please try again later.');
       }
     } catch (e) {
       rethrow;

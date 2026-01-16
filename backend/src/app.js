@@ -47,9 +47,12 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/try-on', tryOnRoutes);
 
 app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err);
+    console.error('STACK:', err.stack);
+
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
     res.status(statusCode).json({
-        message: err.message,
+        message: err.message || 'An unexpected server error occurred',
         stack: process.env.NODE_ENV === 'production' ? null : err.stack,
     });
 });

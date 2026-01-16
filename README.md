@@ -20,8 +20,8 @@ samples, guidance on mobile development, and a full API reference.
 The application consumes the following APIs:
 
 ## Base URLs
-- **Main Backend:** `http://localhost:5000/api`
-- **Try-On Service:** `http://localhost:8000`
+- **Backend API:** `https://v-tryon-web.onrender.com/api`
+- **Try-On Endpoint:** `https://v-tryon-web.onrender.com/api/try-on`
 
 ## Endpoints
 
